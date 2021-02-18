@@ -2446,7 +2446,7 @@ en:
         when: "When:"
         time_frame_required: "Please select a time frame"
         min_duration: "Duration must be greater than 0"
-        max_duration: "Duration must be less than 2 years"
+        max_duration: "Duration must be less than 20 years"
       auto_update_input:
         none: "Select a timeframe"
         now: "Now"
@@ -4231,6 +4231,7 @@ en:
             one: "Theme is %{count} commit behind!"
             other: "Theme is %{count} commits behind!"
           compare_commits: "(See new commits)"
+          remote_theme_edits: "If you want to edit this theme, you must <a href='%{repoURL}' target='_blank'>submit a change on its repository</a>"
           repo_unreachable: "Couldn't contact the Git repository of this theme. Error message:"
           imported_from_archive: "This theme was imported from a .zip file"
           scss:
@@ -4675,6 +4676,9 @@ en:
         not_verified: "Not verified"
         check_email:
           title: "Reveal this user's email address"
+          text: "Show"
+        check_sso:
+          title: "Reveal SSO payload"
           text: "Show"
 
       user:
