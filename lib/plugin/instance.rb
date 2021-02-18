@@ -791,6 +791,13 @@ class Plugin::Instance
     end
   end
 
+  # Register a new API key scope.
+  #
+  # Example:
+  # add_api_key_scope(:groups, { delete: { actions: %w[groups#add_members], params: %i[id] } })
+  #
+  # This scope lets you add members to a group. Additionally, you can specify which group ids are allowed.
+  # The delete action is added to the groups resource.
   def add_api_key_scope(resource, action)
     DiscoursePluginRegistry.register_api_key_scope_mapping({ resource => action }, self)
   end
@@ -859,6 +866,15 @@ class Plugin::Instance
         actions: actions,
         formats: formats
       ), self)
+  end
+
+  # Register a new demon process to be forked by the Unicorn master.
+  # The demon_class should inherit from Demon::Base.
+  # With great power comes great responsibility - this method should
+  # be used with extreme caution. See `config/unicorn.conf.rb`.
+  def register_demon_process(demon_class)
+    raise "Not a demon class" if !demon_class.ancestors.include?(Demon::Base)
+    DiscoursePluginRegistry.demon_processes << demon_class
   end
 
   protected

@@ -50,8 +50,12 @@ class TagsController < ::ApplicationController
         .includes(:tags)
 
       category_tag_counts = categories.map do |c|
-        { id: c.id, tags: self.class.tag_counts_json(c.tags.where(target_tag_id: nil)) }
-      end
+        category_tags = self.class.tag_counts_json(
+          DiscourseTagging.filter_visible(c.tags.where(target_tag_id: nil), guardian)
+        )
+        next if category_tags.empty?
+        { id: c.id, tags: category_tags }
+      end.compact
 
       @tags = self.class.tag_counts_json(unrestricted_tags, show_pm_tags: guardian.can_tag_pms?)
       @extras = { categories: category_tag_counts }
@@ -448,7 +452,7 @@ class TagsController < ::ApplicationController
       search: params[:search],
       q: params[:q]
     )
-    options[:no_subcategories] = true if params[:no_subcategories] == 'true'
+    options[:no_subcategories] = true if params[:no_subcategories] == true || params[:no_subcategories] == 'true'
     options[:per_page] = params[:per_page].to_i.clamp(1, 30) if params[:per_page].present?
 
     if params[:tag_id] == 'none'

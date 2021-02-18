@@ -146,6 +146,7 @@ const DiscourseURL = EmberObject.extend({
       }
 
       lockon = new LockOn(selector, {
+        originalTopOffset: opts.originalTopOffset,
         finished() {
           _transitioning = false;
           lockon = null;
@@ -246,7 +247,7 @@ const DiscourseURL = EmberObject.extend({
       return this.replaceState(path);
     }
 
-    const oldPath = window.location.pathname;
+    const oldPath = `${window.location.pathname}${window.location.search}`;
     path = path.replace(/(https?\:)?\/\/[^\/]+/, "");
 
     // Rewrite /my/* urls
@@ -491,6 +492,25 @@ export function prefixProtocol(url) {
   return url.indexOf("://") === -1 && url.indexOf("mailto:") !== 0
     ? "https://" + url
     : url;
+}
+
+export function getCategoryAndTagUrl(category, subcategories, tag) {
+  let url;
+
+  if (category) {
+    url = category.url;
+    if (!subcategories) {
+      url += "/none";
+    }
+  }
+
+  if (tag) {
+    url = url
+      ? "/tags" + url + "/" + tag.toLowerCase()
+      : "/tag/" + tag.toLowerCase();
+  }
+
+  return url || "/";
 }
 
 export default _urlInstance;

@@ -95,13 +95,11 @@ Discourse::Application.routes.draw do
         member do
           put "owners" => "groups#add_owners"
           delete "owners" => "groups#remove_owner"
+          put "primary" => "groups#set_primary"
         end
       end
       resources :groups, except: [:create], constraints: AdminConstraint.new do
         collection do
-          get 'bulk'
-          get 'bulk-complete' => 'groups#bulk'
-          put 'bulk' => 'groups#bulk_perform'
           put "automatic_membership_count" => "groups#automatic_membership_count"
         end
       end
@@ -260,6 +258,8 @@ Discourse::Application.routes.draw do
       get "dashboard/moderation" => "dashboard#moderation"
       get "dashboard/security" => "dashboard#security"
       get "dashboard/reports" => "dashboard#reports"
+      get "dashboard/new-features" => "dashboard#new_features"
+      put "dashboard/mark-new-features-as-seen" => "dashboard#mark_new_features_as_seen"
 
       resources :dashboard, only: [:index] do
         collection do
@@ -446,6 +446,7 @@ Discourse::Application.routes.draw do
       put "#{root_path}/:username" => "users#update", constraints: { username: RouteFormat.username }, defaults: { format: :json }
       get "#{root_path}/:username/emails" => "users#check_emails", constraints: { username: RouteFormat.username }
       get "#{root_path}/:username/sso-email" => "users#check_sso_email", constraints: { username: RouteFormat.username }
+      get "#{root_path}/:username/sso-payload" => "users#check_sso_payload", constraints: { username: RouteFormat.username }
       get "#{root_path}/:username/preferences" => "users#preferences", constraints: { username: RouteFormat.username }
       get "#{root_path}/:username/preferences/email" => "users_email#index", constraints: { username: RouteFormat.username }
       get "#{root_path}/:username/preferences/account" => "users#preferences", constraints: { username: RouteFormat.username }
@@ -681,10 +682,8 @@ Discourse::Application.routes.draw do
 
     get "c/:id/show" => "categories#show"
 
-    get "c/:category_slug/find_by_slug" => "categories#find_by_slug"
-    get "c/:parent_category_slug/:category_slug/find_by_slug" => "categories#find_by_slug"
-    get "c/:category_slug/edit(/:tab)" => "categories#find_by_slug", constraints: { format: 'html' }
-    get "c/:parent_category_slug/:category_slug/edit(/:tab)" => "categories#find_by_slug", constraints: { format: 'html' }
+    get "c/*category_slug/find_by_slug" => "categories#find_by_slug"
+    get "c/*category_slug/edit(/:tab)" => "categories#find_by_slug", constraints: { format: 'html' }
     get "/new-category" => "categories#show", constraints: { format: 'html' }
 
     get "c/*category_slug_path_with_id.rss" => "list#category_feed", format: :rss
@@ -961,6 +960,9 @@ Discourse::Application.routes.draw do
     resources :csp_reports, only: [:create]
 
     get "/permalink-check", to: 'permalinks#check'
+
+    post "/do-not-disturb" => "do_not_disturb#create"
+    delete "/do-not-disturb" => "do_not_disturb#destroy"
 
     get "*url", to: 'permalinks#show', constraints: PermalinkConstraint.new
   end

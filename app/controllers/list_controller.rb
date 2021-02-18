@@ -62,7 +62,7 @@ class ListController < ApplicationController
         if @category.id == SiteSetting.shared_drafts_category.to_i
           # On shared drafts, show the destination category
           list.topics.each do |t|
-            t.includes_destination_category = true
+            t.includes_destination_category = t.shared_draft.present?
           end
         else
           # When viewing a non-shared draft category, find topics whose
@@ -360,7 +360,7 @@ class ListController < ApplicationController
       current_slug = current_slug.split("/").map { |slug| CGI.escape(slug) }.join("/")
     end
     real_slug = @category.full_slug("/")
-    if current_slug != real_slug
+    if CGI.unescape(current_slug) != CGI.unescape(real_slug)
       url = request.fullpath.gsub(current_slug, real_slug)
       if ActionController::Base.config.relative_url_root
         url = url.sub(ActionController::Base.config.relative_url_root, "")
