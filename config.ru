@@ -1,10 +1,13 @@
-# frozen_string_literal: true
+require 'rack/rewrite'
 
-# This file is used by Rack-based servers to start the application.
-ENV["DISCOURSE_RUNNING_IN_RACK"] = "1"
-
-require ::File.expand_path('../config/environment',  __FILE__)
-
-map ActionController::Base.config.try(:relative_url_root) || "/" do
-  run Discourse::Application
+use Rack::Rewrite do
+  r301 %r{.*}, 'https://communaute.inclusion.beta.gouv.fr$&'
 end
+
+class EmptyServer
+  def call(env)
+    # We need to boot rack, but all the redirections happen inside the rack-rewrite middleware above
+  end
+end
+
+run EmptyServer.new

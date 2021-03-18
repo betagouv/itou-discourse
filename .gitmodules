@@ -1,7 +1,0 @@
-[submodule "plugins/discourse-solved"]
-	path = plugins/discourse-solved
-	url = https://github.com/discourse/discourse-solved.git
-	branch = main
-[submodule "plugins/discourse-sentry"]
-	path = plugins/discourse-sentry
-	url = https://github.com/debtcollective/discourse-sentry.git
